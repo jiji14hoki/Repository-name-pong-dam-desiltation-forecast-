@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pong Dam Desiltation Forecast System</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+
+--bg:#f5f9fc;
+--card:#ffffff;
+--text:#1f2937;
+--accent:#0b74d1;
+--green:#1ba784;
+--red:#dc3545;
+--orange:#f59e0b;
+--border:#d8e3ee;
+
+}
+
+.dark{
+
+--bg:#0b1726;
+--card:#122236;
+--text:#ecf5ff;
+--border:#28425d;
+
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Poppins,sans-serif;
+}
+
+body{
+background:var(--bg);
+color:var(--text);
+transition:.3s;
+}
+
+header{
+
+height:90vh;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+color:white;
+position:relative;
+background:
+linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.55)),
+url("https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1800&q=80");
+
+background-size:cover;
+background-position:center;
+
+}
+
+header h1{
+font-size:3rem;
+}
+
+header p{
+margin:15px 0;
+font-size:1.1rem;
+}
+
+.btn{
+
+background:#0b74d1;
+color:white;
+padding:14px 30px;
+border-radius:40px;
+display:inline-block;
+cursor:pointer;
+text-decoration:none;
+
+}
+
+.mode{
+
+position:absolute;
+top:25px;
+right:25px;
+padding:12px 18px;
+border:none;
+border-radius:30px;
+cursor:pointer;
+
+}
+
+section{
+padding:60px 8%;
+}
+
+h2{
+margin-bottom:25px;
+font-size:2rem;
+}
+
+.card{
+
+background:var(--card);
+padding:25px;
+border-radius:20px;
+box-shadow:0 12px 30px rgba(0,0,0,.08);
+border:1px solid var(--border);
+
+}
+
+.grid{
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+
+}
+
+input,select{
+
+padding:14px;
+width:100%;
+border-radius:12px;
+border:1px solid var(--border);
+background:var(--card);
+color:var(--text);
+
+}
+
+button{
+
+padding:14px 22px;
+border:none;
+background:var(--accent);
+color:white;
+border-radius:12px;
+cursor:pointer;
+
+}
+
+.result{
+font-size:1.5rem;
+font-weight:700;
+margin-top:10px;
+}
+
+canvas{
+margin-top:30px;
+}
+
+.badge{
+
+display:inline-block;
+padding:8px 16px;
+border-radius:25px;
+font-size:.9rem;
+margin-top:10px;
+
+}
+
+.low{background:#d1fae5;color:#065f46;}
+.medium{background:#fef3c7;color:#92400e;}
+.high{background:#fde68a;color:#78350f;}
+.critical{background:#fecaca;color:#991b1b;}
+
+.team{
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+
+}
+
+.member img{
+
+width:100%;
+height:220px;
+object-fit:cover;
+border-radius:16px;
+
+}
+
+footer{
+
+padding:40px;
+text-align:center;
+background:#07111b;
+color:white;
+
+}
+
+.chatbot{
+
+position:fixed;
+bottom:20px;
+right:20px;
+width:320px;
+background:var(--card);
+border-radius:18px;
+box-shadow:0 20px 40px rgba(0,0,0,.2);
+overflow:hidden;
+
+}
+
+.chat-header{
+
+background:var(--accent);
+color:white;
+padding:12px;
+font-weight:600;
+
+}
+
+.chat-body{
+padding:15px;
+}
+
+.chat-body input{
+margin-top:10px;
+}
+
+.small{
+font-size:.9rem;
+opacity:.8;
+}
+
+iframe{
+width:100%;
+height:420px;
+border:none;
+border-radius:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+<button class="mode" onclick="toggleMode()">🌙 Mode</button>
+
+<div>
+
+<h1>Pong Dam Desiltation Forecast System</h1>
+
+<p>AI-powered sedimentation forecasting for Maharana Pratap Sagar Reservoir (Model Estimate)</p>
+
+<a href="#forecast" class="btn">Explore Forecast</a>
+
+</div>
+
+</header>
+
+<section id="forecast">
+
+<h2>Interactive Silt Forecast</h2>
+
+<div class="card">
+
+<div class="grid">
+
+<div>
+
+<label>Year</label>
+
+<input type="number" id="year" value="2040" min="1980" max="2070">
+
+</div>
+
+<div>
+
+<label>Scenario</label>
+
+<select id="scenario">
+
+<option value="18">Optimistic (18 Mm³/yr)</option>
+<option value="21.5" selected>Realistic (21.5 Mm³/yr)</option>
+<option value="25">Pessimistic (25 Mm³/yr)</option>
+
+</select>
+
+</div>
+
+<div style="display:flex;align-items:end;">
+
+<button onclick="calculate()">Forecast</button>
+
+</div>
+
+</div>
+
+<div class="grid" style="margin-top:30px;">
+
+<div class="card">
+
+<div class="small">Estimated Silt</div>
+
+<div id="silt" class="result">0 Mm³</div>
+
+</div>
+
+<div class="card">
+
+<div class="small">Remaining Live Storage</div>
+
+<div id="storage" class="result">7.29 BCM</div>
+
+</div>
+
+<div class="card">
+
+<div class="small">Capacity Lost</div>
+
+<div id="loss" class="result">0%</div>
+
+</div>
+
+<div class="card">
+
+<div class="small">Urgency</div>
+
+<div id="urgency" class="result">Low</div>
+
+</div>
+
+</div>
+
+<canvas id="forecastChart"></canvas>
+
+</div>
+
+</section>
+
+<section>
+
+<h2>Historical Trend Dashboard</h2>
+
+<div class="card">
+
+<canvas id="historyChart"></canvas>
+
+</div>
+
+</section>
+
+<section>
+
+<h2>Critical Threshold Forecast</h2>
+
+<div class="grid">
+
+<div class="card">
+<h3>80% Storage</h3>
+<div id="y80" class="result"></div>
+</div>
+
+<div class="card">
+<h3>70% Storage</h3>
+<div id="y70" class="result"></div>
+</div>
+
+<div class="card">
+<h3>60% Storage</h3>
+<div id="y60" class="result"></div>
+</div>
+
+</div>
+
+</section>
+
+<section>
+
+<h2>Prediction Model</h2>
+
+<div class="card">
+
+<p>This forecasting model combines:</p>
+
+<ul style="margin-left:20px;margin-top:15px;line-height:1.9">
+
+<li>Historical sedimentation trends</li>
+<li>Published sedimentation-rate ranges (18–25 Mm³/year)</li>
+<li>Scenario analysis</li>
+<li>Linear projection for long-term planning</li>
+<li>Multi-sensor remote sensing concepts (NDWI, Landsat, Sentinel, IRS)</li>
+
+</ul>
+
+<p style="margin-top:20px">
+
+Model outputs are planning estimates and should be validated using official BBMB hydrographic surveys.
+
+</p>
+
+</div>
+
+</section>
+
+<section>
+
+<h2>Data Sources & Transparency</h2>
+
+<div class="card">
+
+<div class="badge low">Data Transparency</div>
+
+<ul style="margin-top:20px;line-height:2;margin-left:20px">
+
+<li>BBMB annual reports and reservoir information</li>
+<li>Bhuvan Water Bodies Information System</li>
+<li>Sentinel & Landsat satellite imagery</li>
+<li>IRS LISS-III remote sensing</li>
+<li>Bathymetric surveys</li>
+<li>SWAT watershed modelling</li>
+<li>Published scientific sedimentation studies</li>
+
+</ul>
+
+<p style="margin-top:20px">
+
+This demonstration combines publicly discussed sedimentation-rate ranges with simplified forecasting for visualization purposes.
+
+</p>
+
+</div>
+
+</section>
+
+<section>
+
+<h2>Pong Reservoir Map</h2>
+
+<div class="card">
+
+<iframe src="https://bhuvan-wbis.nrsc.gov.in"></iframe>
+
+</div>
+
+</section>
+
+<section>
+
+<h2>Project Members</h2>
+
+<div class="team">
+
+<div class="card member">
+
+<img src="https://via.placeholder.com/300x220">
+
+<h3>[Project Lead]</h3>
+
+<p>AI Forecast Development</p>
+
+</div>
+
+<div class="card member">
+
+<img src="https://via.placeholder.com/300x220">
+
+<h3>[Data Analyst]</h3>
+
+<p>Hydrological Analysis</p>
+
+</div>
+
+<div class="card member">
+
+<img src="https://via.placeholder.com/300x220">
+
+<h3>[ML Engineer]</h3>
+
+<p>Forecast Modelling</p>
+
+</div>
+
+<div class="card member">
+
+<img src="https://via.placeholder.com/300x220">
+
+<h3>[UI Designer]</h3>
+
+<p>Dashboard Design</p>
+
+</div>
+
+</div>
+
+</section>
+
+<section>
+
+<div class="card" style="text-align:center;">
+
+<h2>Download Forecast Report</h2>
+
+<p>Generate a printable PDF using your browser.</p>
+
+<button onclick="window.print()">Download PDF</button>
+
+</div>
+
+</section>
+
+<div class="chatbot">
+
+<div class="chat-header">
+
+Ask the Model
+
+</div>
+
+<div class="chat-body">
+
+<div id="chatResponse" class="small">Ask "What will be the silt in 2040?"</div>
+
+<input id="chatInput" placeholder="Type here...">
+
+<button style="margin-top:10px;width:100%;" onclick="chat()">Ask</button>
+
+</div>
+
+</div>
+
+<footer>
+
+<h3>Pong Dam Desiltation Forecast System</h3>
+
+<p>BBMB Planning Dashboard • Educational Demonstration</p>
+
+</footer>
+
+<script>
+
+const ORIGINAL=7290;
+
+let forecastChart,historyChart;
+
+function calculate(){
+
+const year=parseInt(document.getElementById("year").value);
+
+const rate=parseFloat(document.getElementById("scenario").value);
+
+const deposited=Math.max(0,(year-1980)*rate);
+
+const remaining=Math.max(0,ORIGINAL-deposited);
+
+const loss=((deposited/ORIGINAL)*100).toFixed(1);
+
+document.getElementById("silt").innerHTML=deposited.toFixed(0)+" Mm³";
+
+document.getElementById("storage").innerHTML=(remaining/1000).toFixed(2)+" BCM";
+
+document.getElementById("loss").innerHTML=loss+"%";
+
+let level="Low";
+
+if(loss>40)level="Critical";
+else if(loss>30)level="High";
+else if(loss>20)level="Medium";
+
+document.getElementById("urgency").innerHTML=level;
+
+drawForecast(rate);
+thresholds(rate);
+
+}
+
+function thresholds(rate){
+
+function yearAt(percent){
+
+let target=ORIGINAL*percent;
+let dep=ORIGINAL-target;
+return Math.round(1980+dep/rate);
+
+}
+
+document.getElementById("y80").innerHTML=yearAt(.8);
+document.getElementById("y70").innerHTML=yearAt(.7);
+document.getElementById("y60").innerHTML=yearAt(.6);
+
+}
+
+function drawForecast(rate){
+
+let years=[],values=[];
+
+for(let y=1980;y<=2070;y++){
+
+years.push(y);
+values.push((y-1980)*rate);
+
+}
+
+if(forecastChart)forecastChart.destroy();
+
+forecastChart=new Chart(document.getElementById("forecastChart"),{
+
+type:"line",
+
+data:{
+labels:years,
+datasets:[{
+label:"Model Estimated Cumulative Silt (Mm³)",
+data:values,
+borderColor:"#0b74d1",
+fill:true,
+backgroundColor:"rgba(11,116,209,.15)"
+}]
+}
+
+});
+
+}
+
+function drawHistory(){
+
+let years=[],storage=[];
+
+for(let y=1980;y<=2070;y++){
+
+years.push(y);
+storage.push((ORIGINAL-(y-1980)*21.5)/1000);
+
+}
+
+historyChart=new Chart(document.getElementById("historyChart"),{
+
+type:"line",
+
+data:{
+labels:years,
+datasets:[{
+label:"Model Estimated Live Storage (BCM)",
+data:storage,
+borderColor:"#1ba784",
+fill:true,
+backgroundColor:"rgba(27,167,132,.15)"
+}]
+}
+
+});
+
+}
+
+function toggleMode(){
+
+document.body.classList.toggle("dark");
+
+}
+
+function chat(){
+
+const q=document.getElementById("chatInput").value.toLowerCase();
+
+let response="";
+
+if(q.includes("2040")){
+
+response="Model estimate: Around 1,290 Mm³ cumulative silt by 2040 (realistic scenario).";
+
+}else if(q.includes("desilt")){
+
+response="Planning priority increases as storage approaches the 70% threshold. Official hydrographic surveys should confirm timing.";
+
+}else{
+
+response="Try asking about a year or desilting timing.";
+
+}
+
+document.getElementById("chatResponse").innerHTML=response;
+
+}
+
+calculate();
+drawHistory();
+
+</script>
+
+</body>
+</html>
